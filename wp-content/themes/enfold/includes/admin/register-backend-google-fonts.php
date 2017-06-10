@@ -1,13 +1,15 @@
 <?php
 
 $google_fonts = apply_filters('avf_google_heading_font', array(	__('Default', 'avia_framework') =>'',
-	
+						
+						'Advent Pro'=>'Advent Pro:100,400,600',
 						'Alice'=>'Alice',
 						'Allerta'=>'Allerta',
 						'Arvo'=>'Arvo',
 						'Arimo'=>'Arimo:400,700',
 						'Antic'=>'Antic',
-	
+						
+						
 						'Bangers'=>'Bangers',
 						'Bitter'=>'Bitter',
 	
@@ -30,11 +32,15 @@ $google_fonts = apply_filters('avf_google_heading_font', array(	__('Default', 'a
 						
 						
 						'Finger Paint'=>'Finger Paint',
+						'Fira Sans'=>'Fira Sans:100,400,700',
 						'Fjord One'=>'Fjord One',
 						'Flamenco'=>'Flamenco:400,300',
 	
 	
 						'Great Vibes'=>'Great Vibes',
+						
+						'Heebo' => 'Heebo:100,400,700',
+						'Herr Von Muellerhoff' => 'Herr Von Muellerhoff',
 						
 						
 						'Inconsolata'=>'Inconsolata',
@@ -43,6 +49,7 @@ $google_fonts = apply_filters('avf_google_heading_font', array(	__('Default', 'a
 						'Josefin Slab'=>'Josefin Slab',
 	
 						'Kameron'=>'Kameron',
+						'Karla'=>'Karla:400,700',
 						'Kreon'=>'Kreon',
 	
 						'Lato'=>'Lato:300,400,700',
@@ -71,7 +78,10 @@ $google_fonts = apply_filters('avf_google_heading_font', array(	__('Default', 'a
 						'Oswald'=>'Oswald',
 	
 						'Pacifico'=>'Pacifico',
+						'Parisienne'=>'Parisienne',
 						'Petit Formal Script'=>'Petit Formal Script',
+						'Pinyon Script'=>'Pinyon Script',
+						'Playfair Display'=>'Playfair Display:400,700',
 						'Podkova'=>'Podkova',
 						'Poiret One'=>'Poiret One',
 						'Poly'=>'Poly',
@@ -83,7 +93,7 @@ $google_fonts = apply_filters('avf_google_heading_font', array(	__('Default', 'a
 	
 						'Raleway'=>'Raleway',
 						'Righteous' => 'Righteous',
-						'Roboto' => 'Roboto',
+						'Roboto' => 'Roboto:100,400,700',
 						
 						'Sacramento' => 'Sacramento',
 						'Salsa'=>'Salsa',

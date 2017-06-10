@@ -35,6 +35,7 @@ if ( !class_exists( 'avia_masonry' ) )
 		                                 		'query_order' 		=> 'DESC',
 		                                 		'color'				=> '',
 		                                 		'custom_bg'			=> '',
+		                                 		'orientation'		=> '',
 		                                 		), $atts, 'av_masonry_entries');
 		 	
 		 	
@@ -49,8 +50,10 @@ if ( !class_exists( 'avia_masonry' ) )
 		//ajax function to load additional items
 		static function load_more()
 		{
+			if(check_ajax_referer('av-masonry-nonce', 'avno'));
+			
 			//increase the post items by one to fetch an additional item. this item is later removed by the javascript but it tells the script if there are more items to load or not
-			$_POST['items'] = $_POST['items'] + 1;
+			$_POST['items'] = empty($_POST['items']) ? 1 : $_POST['items'] + 1;
 		
 			$masonry  	= new avia_masonry($_POST);
 			$ajax 		= true;
@@ -228,7 +231,9 @@ if ( !class_exists( 'avia_masonry' ) )
 				$style  = AviaHelper::style_string( $style );
 			}
 			
-			$output .= "<div id='av-masonry-".self::$element."' class='av-masonry noHover av-{$size}-size av-{$this->atts['gap']}-gap av-hover-overlay-{$this->atts['overlay_fx']} av-masonry-col-{$this->atts['columns']} av-caption-{$this->atts['caption_display']} av-caption-style-{$this->atts['caption_styling']} {$this->atts['container_class']}' {$style} >";
+			$orientation = $this->atts['size'] == "fixed" ? $this->atts['orientation'] : ""; 
+			
+			$output .= "<div id='av-masonry-".self::$element."' class='av-masonry noHover av-{$size}-size av-{$this->atts['gap']}-gap av-hover-overlay-{$this->atts['overlay_fx']} av-masonry-col-{$this->atts['columns']} av-caption-{$this->atts['caption_display']} av-caption-style-{$this->atts['caption_styling']} {$this->atts['container_class']} {$orientation} ' {$style} >";
 			
 			$output .= $this->atts['sort'] != "no" ? $this->sort_buttons() : "";
 			
@@ -328,6 +333,7 @@ if ( !class_exists( 'avia_masonry' ) )
 			//if its an ajax call return the items only without container
 			if(isset($this->atts['action']) && $this->atts['action'] == 'avia_ajax_masonry_more')
 			{
+				
 				return $items;
 			}
 			
@@ -359,8 +365,8 @@ if ( !class_exists( 'avia_masonry' ) )
 				
 		function load_more_button()
 		{
-			$data_string = AviaHelper::create_data_string($this->atts);
-		
+			$data_string  = AviaHelper::create_data_string($this->atts);
+			$data_string .= " data-avno='".wp_create_nonce( 'av-masonry-nonce' )."'";
 			$output  = "";
 			$output .= 		"<a class='av-masonry-pagination av-masonry-load-more' href='#load-more' {$data_string}>".__('Load more','avia_framework')."</a>";
 			
@@ -430,7 +436,7 @@ if ( !class_exists( 'avia_masonry' ) )
 				$this->loop[$key]['date'] 			= "<span class='av-masonry-date meta-color updated'>".get_the_time($date_format, $id)."</span>";
 				$this->loop[$key]['author'] 		= "<span class='av-masonry-author meta-color vcard author'><span class='fn'>". __('by','avia_framework') .' '. $author."</span></span>";
 				$this->loop[$key]['class'] 			= get_post_class("av-masonry-entry isotope-item", $id); 
-				$this->loop[$key]['content']		= $entry->post_excerpt;
+				$this->loop[$key]['content']		= strip_tags( $entry->post_excerpt );
                 $this->loop[$key]['description']	= !empty($entry->post_content) ? $entry->post_content : $entry->post_excerpt;
 				
 				if(empty($this->loop[$key]['content']))
@@ -442,6 +448,8 @@ if ( !class_exists( 'avia_masonry' ) )
 					
 					$this->loop[$key]['content'] 	= avia_backend_truncate($entry->post_content, apply_filters( 'avf_masonry_excerpt_length' , 60) , apply_filters( 'avf_masonry_excerpt_delimiter' , " "), "…", true, '');
 				}
+				
+				$this->loop[$key]['content'] = nl2br( trim($this->loop[$key]['content']) );
 				
 				//post type specific
 				switch($entry->post_type)
@@ -520,7 +528,7 @@ if ( !class_exists( 'avia_masonry' ) )
 					if(function_exists('avia_woocommerce_enabled') && avia_woocommerce_enabled())
 					{
 						$tagTax 		= "product_tag"; 
-						$product 		= get_product( $id );
+						$product 		= function_exists('wc_get_product') ? wc_get_product($id) : get_product( $id );
 						$overlay_img 	= avia_woocommerce_gallery_first_thumbnail($id, $img_size, true);
 
 						$this->loop[$key]['text_after'] .= '<span class="av-masonry-price price">'.$product->get_price_html()."</span>";
@@ -574,6 +582,7 @@ if ( !class_exists( 'avia_masonry' ) )
 		//fetch new entries
 		public function query_entries($params = array(), $ajax = false)
 		{
+			
 			global $avia_config;
 
 			if(empty($params)) $params = $this->atts;
@@ -581,7 +590,8 @@ if ( !class_exists( 'avia_masonry' ) )
 			if(empty($params['custom_query']))
             {
 				$query = array();
-
+				$avialable_terms = array();
+				
 				if(!empty($params['categories']))
 				{
 					//get the portfolio categories
@@ -591,11 +601,12 @@ if ( !class_exists( 'avia_masonry' ) )
 				$page = get_query_var( 'paged' ) ? get_query_var( 'paged' ) : get_query_var( 'page' );
 				if(!$page || $params['paginate'] == 'no') $page = 1;
 
+				
 				//if we find no terms for the taxonomy fetch all taxonomy terms
 				if(empty($terms[0]) || is_null($terms[0]) || $terms[0] === "null")
 				{
 					$terms = array();
-					$allTax = get_terms( $params['taxonomy']);
+					$allTax = get_terms( $params['taxonomy'] );
 					foreach($allTax as $tax)
 					{
 						if( is_object($tax) )
@@ -604,6 +615,47 @@ if ( !class_exists( 'avia_masonry' ) )
 						}
 					}
 				}
+				
+				
+				
+				if(!empty($params['taxonomy']))
+				{
+					$allTax = get_terms( $params['taxonomy'] );
+					foreach($allTax as $tax)
+					{
+						if( is_object($tax) )
+						{
+							$avialable_terms[] = $tax->term_id;
+						}
+					}
+				}
+				
+				
+				//check if any of the terms passed are valid. if not all existing terms are used
+				$valid_terms = array();
+				foreach($terms as $term)
+				{
+					if(in_array($term, $avialable_terms))
+					{
+						$valid_terms[] = $term;
+					}
+				}
+				
+				if(!empty($valid_terms))
+				{
+					$terms = $valid_terms;
+					$this->atts['categories'] = implode(",", $terms);
+				}
+				else
+				{
+					$terms = $avialable_terms;
+					$this->atts['categories'] = implode(",", $terms);
+				}
+				
+				
+				
+				
+				
 				
 				
 					if(empty($params['post_type'])) $params['post_type'] = get_post_types();

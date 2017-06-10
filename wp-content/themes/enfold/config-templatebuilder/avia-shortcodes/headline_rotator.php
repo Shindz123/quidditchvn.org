@@ -18,6 +18,7 @@ if ( !class_exists( 'avia_sc_headline_rotator' ) )
 				$this->config['shortcode'] 	= 'av_headline_rotator';
 				$this->config['shortcode_nested'] = array('av_rotator_item');
 				$this->config['tooltip'] 	= __('Creates a text rotator for dynamic headings', 'avia_framework' );
+				$this->config['preview'] 	= "large";
 			}
 
 			/**
@@ -292,7 +293,7 @@ if ( !class_exists( 'avia_sc_headline_rotator' ) )
 				
 				
 				$output	 = "";
-				$output .= "<div {$style} class='av-rotator-container".$meta['el_class']."' {$data}>";
+				$output .= "<div {$style} class='av-rotator-container av-rotation-container-".$atts['align']." ".$meta['el_class']."' {$data}>";
 				$output .= "<{$tag} class='av-rotator-container-inner'>";
 				$output .= apply_filters('avia_ampersand', $before_rotating);
 				$output .= "<span class='av-rotator-text av-rotator-multiline-{$multiline}'>";

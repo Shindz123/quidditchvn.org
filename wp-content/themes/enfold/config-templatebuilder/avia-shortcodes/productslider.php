@@ -238,8 +238,16 @@ if ( !class_exists( 'avia_product_slider' ) )
 							while ( have_posts() ) : the_post();
 							if($loop_counter == 1 && $type == 'slider') echo '<ul class="products slide-entry-wrap">';
 
-								woocommerce_get_template_part( 'content', 'product' );
 
+								if(function_exists('wc_get_template_part'))
+								{
+									wc_get_template_part( 'content', 'product'  );
+								}
+								else
+								{
+									woocommerce_get_template_part( 'content', 'product' );
+								}
+								
 							$loop_counter ++;
 							$post_loop_count ++;
 
@@ -351,11 +359,14 @@ if ( !class_exists( 'avia_product_slider' ) )
 					else
 					{
 						$cart_url = $product->add_to_cart_url();
-						$ajax_class = $product->is_purchasable() ? "add_to_cart_button" : "";
+						$ajax_class = $product->is_purchasable() ? "add_to_cart_button ajax_add_to_cart" : "";
 						$rel = $product->is_purchasable() ? "rel='nofollow'" : "";
 					}
 					
-					$image = get_the_post_thumbnail($product->id, 'square', array('class'=>"av-catalogue-image av-cart-update-image av-catalogue-image-{$show_images}"));
+					$product_id = method_exists( $product , 'get_id' ) ? $product->get_id() : $product->id;
+					$product_type = method_exists( $product , 'get_type' ) ? $product->get_type() : $product->product_type;
+					
+					$image = get_the_post_thumbnail( $product_id, 'square', array('class'=>"av-catalogue-image av-cart-update-image av-catalogue-image-{$show_images}"));
 					
 					$text .= $image;
 					$text .= "<div class='av-catalogue-item-inner'>";
@@ -371,10 +382,10 @@ if ( !class_exists( 'avia_product_slider' ) )
 						sprintf( '<a %s href="%s" data-product_id="%s" data-product_sku="%s" class="av-catalogue-item %s product_type_%s">%s</a>',
 							$rel,
 							esc_url( $cart_url ),
-							esc_attr( $product->id ),
+							esc_attr( $product_id ),
 							esc_attr( $product->get_sku() ),
 							$ajax_class,
-							esc_attr( $product->product_type ),
+							esc_attr( $product_type ),
 							$text
 						),
 					$product );

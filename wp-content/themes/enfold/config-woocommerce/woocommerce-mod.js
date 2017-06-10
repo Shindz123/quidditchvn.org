@@ -10,40 +10,57 @@ jQuery(document).ready(function($) {
 	}
 	
 	
+	//make woocommerce 3.6 gallery search icon clickable and open lightbox
+	jQuery( 'body.single-product' ).on( 'click', '.single-product-main-image .avia-wc-30-product-gallery-lightbox', function( e ){
+		e.preventDefault();
+		var clicked = $(this), container = clicked.parents('.single-product-main-image');
+		container.find('.flex-active-slide a.lightbox-added').eq(0).trigger('click');
+	});
+	
+	
 	product_add_to_cart_click();
 	
-	jQuery(".quantity input[type=number]").each(function() {
-	var number = $(this),
-			max = parseFloat( number.attr( 'max' ) ),
-			min = parseFloat( number.attr( 'min' ) ),
-			step = parseInt( number.attr( 'step' ), 10 ),
-			newNum = jQuery(jQuery('<div />').append(number.clone(true)).html().replace('number','text')).insertAfter(number);
-			number.remove();
-
-		setTimeout(function(){
-			if(newNum.next('.plus').length == 0) {
-				var minus = jQuery('<input type="button" value="-" class="minus">').insertBefore(newNum),
-						plus    = jQuery('<input type="button" value="+" class="plus">').insertAfter(newNum);
 	
-				minus.on('click', function(){
-					var the_val = parseInt( newNum.val(), 10 ) - step;
-					the_val = the_val < 0 ? 0 : the_val;
-					the_val = the_val < min ? min : the_val;
-					newNum.val(the_val);
-				});
-				plus.on('click', function(){
-					var the_val = parseInt( newNum.val(), 10 ) + step;
-					the_val = the_val > max ? max : the_val;
-					newNum.val(the_val);
+	function avia_apply_quant_btn()
+	{
+		jQuery(".quantity input[type=number]").each(function() {
+		var number = $(this),
+				max = parseFloat( number.attr( 'max' ) ),
+				min = parseFloat( number.attr( 'min' ) ),
+				step = parseInt( number.attr( 'step' ), 10 ),
+				newNum = jQuery(jQuery('<div />').append(number.clone(true)).html().replace('number','text')).insertAfter(number);
+				number.remove();
 	
-				});
-			}
-		},10);
+			setTimeout(function(){
+				if(newNum.next('.plus').length === 0) {
+					var minus = jQuery('<input type="button" value="-" class="minus">').insertBefore(newNum),
+							plus    = jQuery('<input type="button" value="+" class="plus">').insertAfter(newNum);
+		
+					minus.on('click', function(){
+						var the_val = parseInt( newNum.val(), 10 ) - step;
+						the_val = the_val < 0 ? 0 : the_val;
+						the_val = the_val < min ? min : the_val;
+						newNum.val(the_val).trigger("change");
+					});
+					plus.on('click', function(){
+						var the_val = parseInt( newNum.val(), 10 ) + step;
+						the_val = the_val > max ? max : the_val;
+						newNum.val(the_val).trigger("change");
+		
+					});
+				}
+			},10);
+		
+		});
+	}
 	
-	});
+	avia_apply_quant_btn();
+	
+	//if the cart gets updated via ajax (woocommerce 2.6 and higher) we need to re apply the +/- buttons
+	$( document ).on( 'updated_cart_totals', avia_apply_quant_btn );
 
 	setTimeout(first_load_amount, 10);
-	$('body').bind('added_to_cart', update_cart_dropdown);
+	$('body').on( 'added_to_cart', update_cart_dropdown);
 		
 	// small fix for the hover menu for woocommerce sort buttons since it does no seem to work on mobile devices. 
 	// even if no event is actually bound the css dropdown works. if the binding is removed dropdown does no longer work.
@@ -57,18 +74,19 @@ function update_cart_dropdown(event)
 {
 	var the_html		= jQuery('html'),
 		menu_cart 		= jQuery('.cart_dropdown'),
-		cart_counter	= jQuery('.cart_dropdown#menu-item-shop .av-cart-counter'),
+		cart_counter	= jQuery('.cart_dropdown .av-cart-counter'),
 		empty 			= menu_cart.find('.empty'),
 		msg_success		= menu_cart.data('success'),
 		product 		= jQuery.extend({name:"Product", price:"", image:""}, avia_clicked_product),
 		counter			= 0;
 		
-		if(!empty.length)
+			//	trigger changed in WC 3.0.0 - must check for event explecit
+		if( (empty.length > 0) && ( 'undefined' !== typeof event ) )
 		{
 			the_html.addClass('html_visible_cart');
 		}
 		
-		if(typeof event != 'undefined')
+		if(typeof event !== 'undefined')
 		{
 			var header		 =  jQuery('.html_header_sticky #header_main .cart_dropdown_first, .html_header_sidebar #header_main .cart_dropdown_first'),
 				oldTemplates = jQuery('.added_to_cart_notification').trigger('avia_hide'),
@@ -76,7 +94,7 @@ function update_cart_dropdown(event)
 			
 			if(!header.length) header = 'body';			
 			
-			template.bind('mouseenter avia_hide', function()
+			template.on('mouseenter avia_hide', function()
 			{
 				template.animate({opacity:0, top: parseInt(template.css('top'), 10) + 15 }, function()
 				{
@@ -88,30 +106,38 @@ function update_cart_dropdown(event)
 			setTimeout(function(){ template.trigger('avia_hide'); }, 2500);
 		}
 		
-		menu_cart.find('.cart_list li .quantity').each(function(){
-			counter += parseInt(jQuery(this).text(),10);
-		});
-		
-		if(cart_counter.length && counter > 0)
-		{
-			cart_counter.removeClass('av-active-counter');
-			setTimeout(function(){ cart_counter.addClass('av-active-counter').text(counter); }, 10); 
-		}
+			//	with WC 3.0.0 DOM is not ready - wrong calculation of counter (last element missing)
+		setTimeout(function(){
+						menu_cart.find('.cart_list li .quantity').each(function(){
+							counter += parseInt(jQuery(this).text(),10);
+						});
+
+						if( (cart_counter.length > 0) && (counter > 0) )
+						{
+							cart_counter.removeClass('av-active-counter');
+							setTimeout(function(){ cart_counter.addClass('av-active-counter').text(counter); }, 10); 
+						}
+					}, 300 );
 }
 
 
 var avia_clicked_product = {};
 function track_ajax_add_to_cart()
 {
-	jQuery('body').on('click','.add_to_cart_button', function()
+	jQuery('body').on('click','.add_to_cart_button', function(e)
 	{	
+		
 		var productContainer = jQuery(this).parents('.product').eq(0), product = {};
-			product.name	 = productContainer.find('.inner_product_header h3').text();
+			product.name	 = productContainer.find('.woocommerce-loop-product__title').text();
 			product.image	 = productContainer.find('.thumbnail_container img');
 			product.price	 = productContainer.find('.price .amount').last().text();
 			
+			//lower than woocommerce 3.0.0
+			if(product.name === "") product.name	 = productContainer.find('.inner_product_header h3').text();
+			
+			
 			/*fallbacks*/
-			if(productContainer.length == 0)
+			if(productContainer.length === 0)
 			{
 				productContainer = jQuery(this);
 				product.name	 = productContainer.find('.av-cart-update-title').text();
@@ -160,7 +186,7 @@ function first_load_amount()
 		check();
 		
 		//display the cart for a short moment on page load if a product was added but no notice was delivered (eg template builder page)
-		if (jQuery('.av-display-cart-on-load').length && jQuery('.woocommerce-message').length == 0)
+		if (jQuery('.av-display-cart-on-load').length && jQuery('.woocommerce-message').length === 0)
 		{
 			var dropdown = jQuery('.cart_dropdown');
 			setTimeout( function(){dropdown.trigger('mouseenter'); }, 500);
@@ -180,7 +206,7 @@ function product_add_to_cart_click()
 		
 	if(catalogue.length) loader	= jQuery.avia_utilities.loading(); 
 
-	jbody.on('click', '.add_to_cart_button', function()
+	jbody.on('click', '.add_to_cart_button', function(e)
 	{
 		var button = jQuery(this);
 		button.parents('.product:eq(0)').addClass('adding-to-cart-loading').removeClass('added-to-cart-check');
@@ -189,9 +215,11 @@ function product_add_to_cart_click()
 		{
 			loader.show();
 		}
-	})
+		
+		//e.preventDefault();
+	});
 	
-	jbody.bind('added_to_cart', function()
+	jbody.on( 'added_to_cart', function()
 	{
 		jQuery('.adding-to-cart-loading').removeClass('adding-to-cart-loading').addClass('added-to-cart-check');
 		

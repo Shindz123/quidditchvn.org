@@ -38,7 +38,7 @@
             if(this.container.is('.avia-hidden-dropdown'))
             {
                 this.container.removeClass('avia-hidden-dropdown');
-                this.toggle.removeClass('button-primary');
+                this.toggle.removeClass('av-template-added-highlight');
             }
             else
             {
@@ -171,7 +171,8 @@
 					{
 						action: 'avia_ajax_fetch_builder_template',
 						templateName: name,
-						avia_request: true
+						avia_request: true,
+						_ajax_nonce: $('#avia-loader-nonce').val()
 					},
 					beforeSend: function()
 					{
@@ -227,7 +228,9 @@
 						post_id: avia_globals.post_id,
 						templateName: name,
 						avia_request: true,
-						'avia-save-nonce': $('#avia-save-nonce').val()
+						'avia-save-nonce': $('#avia-save-nonce').val(),
+						_ajax_nonce: $('#avia-loader-nonce').val()
+						
 					},
 					beforeSend: function()
 					{
@@ -300,7 +303,8 @@
 						templateName: name,
 						avia_request: true,
 						templateValue: obj.template_val,
-						'avia-save-nonce': $('#avia-save-nonce').val()
+						'avia-save-nonce': $('#avia-save-nonce').val(),
+						_ajax_nonce: $('#avia-loader-nonce').val()
 					},
 					beforeSend: function()
 					{
@@ -339,7 +343,7 @@
 				                //mark the template button if a single element was saved
 				                if(typeof event != "undefined")
 				                {
-					                obj.toggle.addClass('button-primary');
+					                obj.toggle.addClass('av-template-added-highlight');
 				                }
 							}
 						}

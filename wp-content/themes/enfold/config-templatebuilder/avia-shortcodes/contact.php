@@ -21,6 +21,7 @@ if ( !class_exists( 'avia_sc_contact' ) )
 				$this->config['shortcode'] 	= 'av_contact';
 				$this->config['shortcode_nested'] = array('av_contact_field');
 				$this->config['tooltip'] 	= __('Creates a customizable contact form', 'avia_framework' );
+				$this->config['preview'] 	= "large";
 			}
 
 			/**
@@ -108,7 +109,7 @@ if ( !class_exists( 'avia_sc_contact' ) )
 										"name" 	=> __("Form Element Options", 'avia_framework' ) ,
 										"desc" 	=> __("Enter any number of options that the visitor can choose from. Separate these Options with a comma.", 'avia_framework' ) ."<br/><small>".
 												   __("Example: Option 1, Option 2, Option 3", 'avia_framework' )."</small>"."<br/><small>".
-												   __("Note: If you want to use a coma in the option text you can escape it with \,", 'avia_framework' )."</small>" ,
+												   __("Note: If you want to use a comma in the option text you have to write 2 comma.", 'avia_framework' )."</small>" ,
 
 										"id" 	=> "options",
 										"required" => array('type','equals','select'),
@@ -124,7 +125,14 @@ if ( !class_exists( 'avia_sc_contact' ) )
 										"std" 	=> "",
 										"type" 	=> "checkbox"),	
 										
-									
+									array(	
+										"name" 	=> __("Preselect checkbox", 'avia_framework' ),
+										"desc" 	=> __("Check if you want to preselect the checkbox", 'avia_framework' ) ,
+										"id" 	=> "av_contact_preselect",
+										"required" => array('type','equals','checkbox'),
+										"std" 	=> "",
+										"type" 	=> "checkbox"),	
+										
 									array(
 										"name" 	=> __("Add Description", 'avia_framework' ) ,
 										"id" 	=> "content",

@@ -23,6 +23,7 @@ if ( !class_exists( 'avia_sc_button_full' ) )
 				$this->config['shortcode'] 	= 'av_button_big';
 				$this->config['tooltip'] 	= __('Creates a colored button that stretches across the full width', 'avia_framework' );
 				$this->config['tinyMCE']    = array('tiny_always'=>true);
+				$this->config['preview'] 	= true;
 			}
 		
 			/**
@@ -150,6 +151,7 @@ if ( !class_exists( 'avia_sc_button_full' ) )
 							"std" 	=> "theme-color",
 							"subtype" => array(	
 												__('Theme Color', 'avia_framework' )=>'theme-color',
+												__('Theme Color Highlight', 'avia_framework' )=>'theme-color-highlight',
 												__('Theme Color Subtle', 'avia_framework' )=>'theme-color-subtle',
 												__('Blue', 'avia_framework' )=>'blue',
 												__('Red',  'avia_framework' )=>'red',
@@ -180,9 +182,10 @@ if ( !class_exists( 'avia_sc_button_full' ) )
 							"desc" 	=> __("Choose a background hover color for your button here", 'avia_framework' ),
 							"id" 	=> "color_hover",
 							"type" 	=> "select",
-							"std" 	=> "theme-color-subtle",
+							"std" 	=> "theme-color-alternate",
 							"subtype" => array(	
 												__('Theme Color', 'avia_framework' )=>'theme-color',
+												__('Theme Color Highlight', 'avia_framework' )=>'theme-color-highlight',
 												__('Theme Color Subtle', 'avia_framework' )=>'theme-color-subtle',
 												__('Blue', 'avia_framework' )=>'blue',
 												__('Red',  'avia_framework' )=>'red',
@@ -275,7 +278,7 @@ if ( !class_exists( 'avia_sc_button_full' ) )
 			                                 'link' => '', 
 			                                 'link_target' => '',
 			                                 'color' => 'theme-color',
-			                                 'color_hover' => 'theme-color-subtle',
+			                                 'color_hover' => 'theme-color-highlight',
 			                                 'custom_bg' => '#444444',
 			                                 'custom_bg_hover' => '#444444',
 			                                 'custom_font' => '#ffffff',

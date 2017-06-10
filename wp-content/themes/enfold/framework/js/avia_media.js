@@ -20,7 +20,7 @@
 		// bind the click event to all elements with the class avia_uploader 
 		bind_click: function()
 		{
-			$('.avia_uploader').live('click', function()
+			$('body').on('click', '.avia_uploader', function()
 			{
 				var title  = this.title,
 					idBased = "";
@@ -57,7 +57,7 @@
 		// bind the click event of the remove image links to the removing function
 		bind_remove: function()
 		{
-			$('.avia_remove_image').live('click', function()
+			$('body').on('click', '.avia_remove_image', function()
 			{
 				var container = $(this).parents('.avia_upload_container');
 					
@@ -70,7 +70,7 @@
 		
 		bind_blur: function()
 		{
-			$('.avia_upload_input').live('blur change', function()
+			$('body').on('blur change', '.avia_upload_input', function()
 			{
 				var input = $(this),
 					value = input.val(),
@@ -79,7 +79,7 @@
 					
 					if(value != "")
 					{
-						div.html('<a href="#" class="avia_remove_image">remove</a>' + image);
+						div.html('<a href="#" class="avia_remove_image">×</a>' + image);
 					}
 					else
 					{
@@ -124,11 +124,11 @@
 					
 					if(img.match(/.jpg$|.jpeg$|.png$|.gif$/))
 					{
-						visualInsert = '<a href="#" class="avia_remove_image">remove</a><img src="'+img+'" alt="" />';
+						visualInsert = '<a href="#" class="avia_remove_image">×</a><img src="'+img+'" alt="" />';
 					}
 					else
 					{
-						visualInsert = '<a href="#" class="avia_remove_image">remove</a><img src="'+avia_framework_globals.frameworkUrl+'images/icons/video.png" alt="" />';
+						visualInsert = '<a href="#" class="avia_remove_image">×</a><img src="'+avia_framework_globals.frameworkUrl+'images/icons/video.png" alt="" />';
 					}
 					
 					container.find('.avia_preview_pic').html(visualInsert);
@@ -268,12 +268,12 @@
 					 		  	if(msg.match(/^<img/)) //image insert
 					 		  	{
 					 		  		target.val(attachment_id);
-					 		  		imageTarget.html('<a href="#" class="avia_remove_image">remove</a>'+msg);
+					 		  		imageTarget.html('<a href="#" class="avia_remove_image">×</a>'+msg);
 					 		  	}
 					 		  	else //video insert
 					 		  	{
 					 		  		target.val(msg);
-					 		  		visualInsert = '<a href="#" class="avia_remove_image">remove</a><img src="'+avia_framework_globals.frameworkUrl+'images/icons/video.png" alt="" />';
+					 		  		visualInsert = '<a href="#" class="avia_remove_image">×</a><img src="'+avia_framework_globals.frameworkUrl+'images/icons/video.png" alt="" />';
 					 		  		imageTarget.html(visualInsert);
 					 		  	}
 		
@@ -315,7 +315,7 @@
 		avia_media.idBasedUpload();
 		avia_media.hijack_uploader();
 		avia_media.change_label();
-		$(".slidetoggle").live('mouseenter',avia_media.change_label);
+		$('body').on('mouseenter', '.slidetoggle',avia_media.change_label);
  	});
 
 	

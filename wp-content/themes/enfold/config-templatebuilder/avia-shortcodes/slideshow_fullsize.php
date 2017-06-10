@@ -549,8 +549,17 @@ if ( !class_exists( 'avia_sc_slider_full' ) )
 							"id" 	=> "size",
 							"type" 	=> "select",
 							"std" 	=> "featured",
+				            "container_class" => 'av_half av_half_first',
 							"subtype" =>  AviaHelper::get_registered_image_sizes(1000)		
 							),
+							
+					
+					array(	"name" 	=> __("Slider minimum height in pixel", 'avia_framework' ),
+							"desc" 	=> __("This is helpful on smaller screens if you got a lot of text in your slider", 'avia_framework' ),
+				            "id" 	=> "min_height",
+				            "type" 	=> "input",
+				            "container_class" => 'av_half',
+				            "std" 	=> "0px"),
 					
 					array(	
 						"name" 	=> __("Stretch image to fit the slideshow size?",'avia_framework' ),
@@ -559,6 +568,11 @@ if ( !class_exists( 'avia_sc_slider_full' ) )
 						"type" 	=> "select",
 						"std" 	=> "",
 						"subtype" => array(__('Yes, stretch the image','avia_framework' ) =>'',__('No, dont stretch the image. If the browser window is bigger than the image simply align it centered','avia_framework' ) =>'image_no_stretch')),	
+					
+					
+						
+					
+					
 								
 					array(	
 							"name" 	=> __("Slideshow Transition", 'avia_framework' ),
@@ -601,7 +615,7 @@ if ( !class_exists( 'avia_sc_slider_full' ) )
 						"id" 	=> "control_layout",
 						"type" 	=> "select",
 						"std" 	=> "av-control-default",
-						"subtype" => array(__('Default','avia_framework' ) =>'av-control-default',__('Minimal','avia_framework' ) =>'av-control-minimal',__('Hidden','avia_framework' ) =>'av-control-hidden')),	
+						"subtype" => array(__('Default','avia_framework' ) =>'av-control-default',__('Minimal White','avia_framework' ) =>'av-control-minimal', __('Minimal Black','avia_framework' ) =>'av-control-minimal av-control-minimal-dark',__('Hidden','avia_framework' ) =>'av-control-hidden')),	
 						
 					array(	
 						"name" 	=> __("Use first slides caption as permanent caption", 'avia_framework' ),
@@ -742,7 +756,8 @@ if ( !class_exists( 'avia_sc_slider_full' ) )
 				'control_layout'=> 'av-control-default',
 				'perma_caption'	=> '',
 				'autoplay_stopper'=>'',
-				'content'		=> ShortcodeHelper::shortcode2array($content, 1)
+				'content'		=> ShortcodeHelper::shortcode2array($content, 1),
+				'min_height'	=> '0px'
 				
 				), $atts, $this->config['shortcode']);
 				

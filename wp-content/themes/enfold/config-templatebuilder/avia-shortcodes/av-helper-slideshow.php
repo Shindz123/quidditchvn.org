@@ -30,7 +30,9 @@ if ( !class_exists( 'avia_slideshow' ) )
 				'content'		=> array(),
 				'custom_markup' => '',
 				'perma_caption'	=> '',
-				'autoplay_stopper'=>''
+				'autoplay_stopper'=>'',
+				'image_attachment'=>'',
+				'min_height'	  =>'0px'
 				), $config);
 
 			$this->config = apply_filters('avf_slideshow_config', $this->config);
@@ -137,7 +139,7 @@ if ( !class_exists( 'avia_slideshow' ) )
 			
 			if(!empty($this->config['scroll_down']))
 			{	
-				$html .= "<a href='#next-section' title='' class='scroll-down-link' ". av_icon_string( 'scrolldown' ). "></a>";
+				$html .= "<a href='#next-section' title='' class='scroll-down-link ".$this->config['control_layout']."' ". av_icon_string( 'scrolldown' ). "></a>";
 				$extraClass .= "av-slider-scroll-down-active";
 			}
 			
@@ -207,11 +209,12 @@ if ( !class_exists( 'avia_slideshow' ) )
                     $imgtitle = trim($slide->post_title) ? esc_attr($slide->post_title) : "";
                   	if($imgtitle == "-") $imgtitle = "";
                     $imgdescription = trim($slide->post_content) ? esc_attr($slide->post_content) : "";
+					
 
 					$tags = apply_filters('avf_slideshow_link_tags', array("a href='".$link[0]."' title='".$imgdescription."'",'a')); // can be filtered and for example be replaced by array('div','div')
 					
 					$html .= "<li class='slide-{$counter} slide-id-".$slide->ID."'>";
-					$html .= "<".$tags[0]." >{$caption}<img src='".$img[0]."' width='".$img[1]."' height='".$img[2]."' title='".$imgtitle."' alt='".$imgalt."' $markup_url /></ ".$tags[1]." >";
+					$html .= "<".$tags[0]." >{$caption}<img src='".$img[0]."' width='".$img[1]."' height='".$img[2]."' title='".$imgtitle."' alt='".$imgalt."' $markup_url  /></ ".$tags[1]." >";
 					$html .= "</li>";
 				}
 				else
@@ -486,7 +489,19 @@ if ( !class_exists( 'avia_slideshow' ) )
 					$html .= "<".$tags[0]." data-rel='slideshow-".avia_slideshow::$slider."' class='avia-slide-wrap' {$linkdescription} >{$caption}";
 					if($this->config['bg_slider'] != "true" && empty($video))
 					{
-						$html .= "<img src='".$img[0]."' width='".$img[1]."' height='".$img[2]."' title='".$linktitle."' alt='".$linkalt."' $markup_url />";
+						$img_style = "";
+						if(!empty($this->config['min_height']) && $this->config['min_height'] != "0px")
+						{
+							$percent = 100 / (100/$img[2] * (int) $this->config['min_height'] );
+							$this->config['min_width'] = ceil(($img[1] / $percent)) . "px";
+							
+							$img_style .= AviaHelper::style_string($this->config, 'min_height', 'min-height');
+							$img_style .= AviaHelper::style_string($this->config, 'min_width', 'min-width');
+							$img_style  = AviaHelper::style_string($img_style);
+						}
+				
+						
+						$html .= "<img src='".$img[0]."' width='".$img[1]."' height='".$img[2]."' title='".$linktitle."' alt='".$linkalt."' $markup_url $img_style />";
 					}
 					$html .= $video;
 					$html .= $this->create_overlay($meta);

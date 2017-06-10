@@ -56,6 +56,13 @@ add_theme_support('avia_mega_menu');
 
 
 
+/*
+ * add support for improved backend styling
+ */
+ 
+add_theme_support('avia_improved_backend_style');
+
+
 
 /*
  * deactivates the default mega menu and allows us to pass individual menu walkers when calling a menu
@@ -91,6 +98,26 @@ if(!function_exists('avia_lang_setup'))
 	
 	avia_lang_setup();
 }
+
+
+/*
+function that changes the icon of the  theme update tab
+*/
+
+if(!function_exists('avia_theme_update_filter'))
+{
+	function avia_theme_update_filter( $data )
+	{
+		if(current_theme_supports('avia_improved_backend_style'))
+		{
+			$data['icon'] = 'new/arrow-repeat-two-7@3x.png';
+		}
+		return $data;
+	}
+	
+	add_filter('avf_update_theme_tab', 'avia_theme_update_filter', 30, 1);
+}
+
 
 
 
@@ -269,8 +296,8 @@ if(!function_exists('avia_register_frontend_scripts'))
 
 	function avia_register_frontend_scripts()
 	{
-		$template_url = get_template_directory_uri();
-		$child_theme_url = get_stylesheet_directory_uri();
+		$template_url 		= get_template_directory_uri();
+		$child_theme_url 	= get_stylesheet_directory_uri();
 
 		//register js
 		wp_enqueue_script( 'avia-compat', $template_url.'/js/avia-compat.js', array('jquery'), 2, false ); //needs to be loaded at the top to prevent bugs
@@ -535,3 +562,4 @@ require_once( 'functions-enfold.php');
  * add option to edit elements via css class
  */
 // add_theme_support('avia_template_builder_custom_css');
+

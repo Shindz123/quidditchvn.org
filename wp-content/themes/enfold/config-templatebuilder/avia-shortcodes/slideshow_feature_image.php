@@ -20,6 +20,7 @@ if ( !class_exists( 'avia_sc_featureimage_slider' ))
 			$this->config['shortcode'] 	= 'av_feature_image_slider';
 			$this->config['tooltip'] 	= __('Display a Slideshow of featured images from various posts', 'avia_framework' );
 			$this->config['drag-level'] = 3;
+			$this->config['preview'] 		= 0;
 		}
 
 		/**
@@ -96,7 +97,7 @@ if ( !class_exists( 'avia_sc_featureimage_slider' ))
 
 				array(
 		                    "name"  => __("Slider Width/Height Ratio", 'avia_framework' ),
-		                    "desc"  => __("The slider will always stretch the full available width. Here you can enter the coresponding height (eg: 4:3, 16:9) or a fixed height in px (eg: 300px)", 'avia_framework' ),
+		                    "desc"  => __("The slider will always stretch the full available width. Here you can enter the corresponding height (eg: 4:3, 16:9) or a fixed height in px (eg: 300px)", 'avia_framework' ),
 		                    "id"    => "slider_size",
 		                    "type" 	=> "input",
 							"std" 	=> "16:9",
@@ -131,7 +132,7 @@ if ( !class_exists( 'avia_sc_featureimage_slider' ))
 						"id" 	=> "control_layout",
 						"type" 	=> "select",
 						"std" 	=> "",
-						"subtype" => array(__('Default','avia_framework' ) =>'',__('Minimal','avia_framework' ) =>'av-control-minimal',__('Hidden','avia_framework' ) =>'av-control-hidden')),
+						"subtype" => array(__('Default','avia_framework' ) =>'av-control-default',__('Minimal White','avia_framework' ) =>'av-control-minimal', __('Minimal Black','avia_framework' ) =>'av-control-minimal av-control-minimal-dark',__('Hidden','avia_framework' ) =>'av-control-hidden')),	
 					
 					
 					

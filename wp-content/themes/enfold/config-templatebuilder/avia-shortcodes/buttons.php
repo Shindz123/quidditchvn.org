@@ -21,6 +21,7 @@ if ( !class_exists( 'avia_sc_button' ) )
 				$this->config['shortcode'] 	= 'av_button';
 				$this->config['tooltip'] 	= __('Creates a colored button', 'avia_framework' );
 				$this->config['tinyMCE']    = array('tiny_always'=>true);
+				$this->config['preview'] 	= true;
 			}
 		
 			/**
@@ -148,6 +149,7 @@ if ( !class_exists( 'avia_sc_button' ) )
 														
 												__('Colored Buttons', 'avia_framework' ) => array(
 												__('Theme Color', 'avia_framework' )=>'theme-color',
+												__('Theme Color Highlight', 'avia_framework' )=>'theme-color-highlight',
 												__('Theme Color Subtle', 'avia_framework' )=>'theme-color-subtle',
 												__('Blue', 'avia_framework' )=>'blue',
 												__('Red',  'avia_framework' )=>'red',
@@ -257,7 +259,7 @@ if ( !class_exists( 'avia_sc_button' ) )
 			                                 'font' =>'',
 			                                 'icon_hover' => '',
 			                                 ), $atts, $this->config['shortcode']);
-			
+											 
 				$display_char 	= av_icon($atts['icon'], $atts['font']);
 				$extraClass 	= $atts['icon_hover'] ? "av-icon-on-hover" : "";
 				

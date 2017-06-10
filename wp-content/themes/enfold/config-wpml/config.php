@@ -485,7 +485,7 @@ if(defined('ICL_SITEPRESS_VERSION') && defined('ICL_LANGUAGE_CODE'))
 		function avia_change_wpml_home_link($url, $lang)
 		{
 		    global $sitepress;
-		    if(is_home() || is_front_page()) $url = $sitepress->language_url($lang['language_code']);
+		    if(is_front_page()) $url = $sitepress->language_url($lang['language_code']);
 		    return $url;
 		}
 	}
@@ -549,8 +549,8 @@ if(defined('ICL_SITEPRESS_VERSION') && defined('ICL_LANGUAGE_CODE'))
 	if(!function_exists('avia_append_lang_flags'))
 	{
 		//first append search item to main menu
-		add_filter( 'wp_nav_menu_items', 'avia_append_lang_flags', 20, 2 );
-		add_filter( 'avf_fallback_menu_items', 'avia_append_lang_flags', 20, 2 );
+		add_filter( 'wp_nav_menu_items', 'avia_append_lang_flags', 9998, 2 );
+		add_filter( 'avf_fallback_menu_items', 'avia_append_lang_flags', 9998, 2 );
 		
 		function avia_append_lang_flags( $items, $args )
 		{
@@ -569,7 +569,7 @@ if(defined('ICL_SITEPRESS_VERSION') && defined('ICL_LANGUAGE_CODE'))
 		            {
 		                $currentlang = (ICL_LANGUAGE_CODE == $lang['language_code']) ? 'avia_current_lang' : '';
 		
-		                if(is_home() || is_front_page()) $lang['url'] = $sitepress->language_url($lang['language_code']);
+		                if(is_front_page()) $lang['url'] = $sitepress->language_url($lang['language_code']);
 		
 		                $items .= "<li class='av-language-switch-item language_".$lang['language_code']." $currentlang'><a href='".$lang['url']."'>";
 		                $items .= "	<span class='language_flag'><img title='".$lang['native_name']."' src='".$lang['country_flag_url']."' /></span>";
@@ -690,7 +690,24 @@ if(defined('ICL_SITEPRESS_VERSION') && defined('ICL_LANGUAGE_CODE'))
 
 }
 
-
+/*fix for: https://wpml.org/errata/translation-editor-support-avia-layout-builder-enfold/*/
+if(!function_exists('avia_wpml_sync_avia_layout_builder'))
+{
+	add_action( 'wpml_translation_job_saved', 'avia_wpml_sync_avia_layout_builder', 10, 3 );
+	
+	function avia_wpml_sync_avia_layout_builder( $new_post_id, $fields, $job ) {
+	    if ( isset( $fields['body']['data'] ) ) {
+	        if ( 'active' === get_post_meta( $new_post_id, '_aviaLayoutBuilder_active', true ) ) {
+	            update_post_meta(
+	                $new_post_id,
+	                '_aviaLayoutBuilderCleanData',
+	                $fields['body']['data']
+	            );
+	        }
+	    }
+	}
+	
+}
 
 
 

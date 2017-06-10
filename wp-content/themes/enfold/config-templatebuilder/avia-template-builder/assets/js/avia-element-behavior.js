@@ -47,15 +47,19 @@
     	
     	 //tooltips for the help icon
     	new $.AviaTooltip({'class': 'avia-help-tooltip', data: 'avia-help-tooltip', event:'click', position:'bottom', attach:'body'});
+    	
 	});
 	
 	
 	$.AviaElementBehavior.gmaps_fetcher =  function()
 	{	
-		var map_api 	= 'https://maps.googleapis.com/maps/api/js?v=3.24&callback=av_builder_maps_loaded', 
-			loading 	= false,
-			clicked		= {};
-	
+		var map_api 		= 'https://maps.googleapis.com/maps/api/js?v=3.27&callback=av_builder_maps_loaded', 
+			loading 		= false,
+			clicked			= {},
+			timeout_check 	= false,
+			timout_timer	= 1500;
+			
+		
 		$("body").on('click', '.avia-js-google-coordinates', function()
 		{
 			clicked = this;
@@ -67,15 +71,23 @@
 				var script 	= document.createElement('script');
 				script.type = 'text/javascript';	
 				script.src 	= map_api;
+				
+				if(avia_framework_globals.gmap_api != 'undefined' && avia_framework_globals.gmap_api != "")
+				{
+					script.src 	+= "&key=" + avia_framework_globals.gmap_api;
+				}
+				
       			document.body.appendChild(script);
+      			
 			}
 			else if(typeof window.google != 'undefined' && typeof window.google.maps != 'undefined')
 			{
 				window.av_builder_maps_loaded();
 			}
-			
+
 			return false;
 		});
+		
 		
 		
 		window.av_builder_maps_loaded = function(data)
@@ -98,10 +110,14 @@
 			
 			var geocoder 	= new google.maps.Geocoder(),
 				addressGeo	= data.address,
-				coordinates = {};
+				coordinates = {},
+				executed	= false;
+			
 			
 			geocoder.geocode( { 'address': addressGeo}, function(results, status)
             {
+	            executed = true;
+	            
                 if (status == google.maps.GeocoderStatus.OK)
                 {
                     coordinates.latitude = results[0].geometry.location.lat();
@@ -114,21 +130,40 @@
                 {
                     if (!addressGeo.replace(/\s/g, '').length)
                     {
-                        coordinates.errormessage = avia_gmaps_L10n.insertaddress;
+	                    new $.AviaModalNotification({mode:'error', msg:avia_modal_L10n.insertaddress});
                     }
                     else
                     {
-                        coordinates.errormessage = avia_gmaps_L10n.notfound;
+                         new $.AviaModalNotification({mode:'error', msg:avia_modal_L10n.notfound});
                     }
                 }
                 else if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT)
                 {
-                    coordinates.errormessage = avia_gmaps_L10n.toomanyrequests;
+	                new $.AviaModalNotification({mode:'error', msg:avia_modal_L10n.toomanyrequests});
                 }
-
-                if(typeof coordinates.errormessage != 'undefined' && coordinates.errormessage != '') alert(coordinates.errormessage);
+                else if (status == google.maps.GeocoderStatus.REQUEST_DENIED) 
+                {
+	                new $.AviaModalNotification({mode:'error', msg:avia_modal_L10n.gmap_api_text});
+                }
+				
                 data.coordinatcontainer.addClass('av-visible');
+                    
             });
+            
+            
+            //check if the google geocoder has requested the data
+            if(timeout_check === false)
+            {
+	            timeout_check = setTimeout(function(){
+		            
+		            if(executed === false)
+		            {
+			           new $.AviaModalNotification({mode:'error', msg:avia_modal_L10n.gmap_api_wrong}); 
+			           timeout_check = false;
+			           timout_timer = 0; //consecutive requests should be show instantly
+		            }
+	            }, timout_timer);
+            }
 		}
 	}
 	
@@ -197,8 +232,6 @@
 	{
 		$("body").on('click', '.avia-attach-element-select', function()
 		{
-			
-		
 			var clicked = $(this),
 				parent  = clicked.parents('.avia-attach-element-container:eq(0)'),
 				old 	= parent.find('.avia-active-element').removeClass('avia-active-element'),
@@ -215,6 +248,8 @@
 				//window.prompt ("Copy to clipboard: Ctrl+C, Enter", clicked.data('element-nr'));
 				//clicked.css({display:'none'});
 				
+				
+				input.trigger('change');
 				return false;
 		});
 	}
@@ -309,7 +344,7 @@
 	{
 		var the_body = $("body"), container = "";
 	
-		the_body.on('change', '.avia-style select, .avia-style textarea, .avia-style radio, .avia-style input[type=checkbox], .avia-style input[type=hidden], .avia-style input[type=text]', function()
+		the_body.on('change', '.avia-style select, .avia-style textarea, .avia-style radio, .avia-style input[type=checkbox], .avia-style input[type=hidden], .avia-style input[type=text], .avia-style input[type=radio]', function()
 		{
 			var current 	= $(this), 
 				scope	= current.parents('.avia-modal:eq(0)');
@@ -322,6 +357,13 @@
 				is_hidden	= current.parents('.avia-form-element-container:eq(0)').is('.avia-hidden');
 				
 				if(current.is('input[type=checkbox]') && !current.prop('checked')) value1 = "";
+				if(current.is('input[type=radio]'))
+				{
+					var name = this.name.replace(/aviaTB/g,"");
+					dependent = scope.find('.avia-form-element-container[data-check-element="'+name+'"]'); 
+				}
+				
+								
 				if(!dependent.length) return;
 				
 				dependent.each(function()
